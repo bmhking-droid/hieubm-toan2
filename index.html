@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Ai Là Triệu Phú - Toán Lớp 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800;900&family=Comic+Neue:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Montserrat", sans-serif;
+        background: radial-gradient(circle at center, #1b2755 0%, #0a0e27 100%);
+        color: #ffffff;
+        min-height: 100vh;
+        margin: 0;
+        user-select: none;
+        touch-action: manipulation;
+        overflow-x: hidden;
+      }
+
+      /* Quiz Diamond Option Shape */
+      .option-btn {
+        background: linear-gradient(180deg, #101c42 0%, #070c20 100%);
+        border: 2px solid #3b82f6;
+        box-shadow:
+          inset 0 0 10px rgba(59, 130, 246, 0.3),
+          0 4px 6px rgba(0, 0, 0, 0.5);
+        transition: all 0.2s ease;
+        position: relative;
+      }
+
+      .option-btn:hover:not(:disabled) {
+        border-color: #f59e0b;
+        background: linear-gradient(180deg, #1e3a8a 0%, #0f172a 100%);
+        transform: translateY(-2px);
+        box-shadow:
+          inset 0 0 15px rgba(245, 158, 11, 0.4),
+          0 6px 12px rgba(0, 0, 0, 0.6);
+      }
+
+      .option-btn.selected {
+        background: linear-gradient(
+          180deg,
+          #d97706 0%,
+          #78350f 100%
+        ) !important;
+        border-color: #fbbf24 !important;
+        animation: pulse 0.8s infinite alternate;
+      }
+
+      .option-btn.correct {
+        background: linear-gradient(
+          180deg,
+          #15803d 0%,
+          #064e3b 100%
+        ) !important;
+        border-color: #22c55e !important;
+        box-shadow: 0 0 20px rgba(34, 197, 94, 0.8) !important;
+      }
+
+      .option-btn.wrong {
+        background: linear-gradient(
+          180deg,
+          #b91c1c 0%,
+          #450a0a 100%
+        ) !important;
+        border-color: #ef4444 !important;
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.8) !important;
+      }
+
+      .question-box {
+        background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+        border: 3px solid #f59e0b;
+        box-shadow: 0 0 25px rgba(245, 158, 11, 0.3);
+      }
+
+      .lifeline-btn {
+        background: linear-gradient(180deg, #1e40af 0%, #1e1b4b 100%);
+        border: 2px solid #60a5fa;
+        transition: all 0.2s;
+      }
+
+      .lifeline-btn:hover:not(:disabled) {
+        transform: scale(1.05);
+        border-color: #fbbf24;
+      }
+
+      .lifeline-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+        border-color: #4b5563;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        100% {
+          transform: scale(1.02);
+        }
+      }
+
+      .heart {
+        color: #ef4444;
+        filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.7));
+        transition: transform 0.3s;
+      }
+
+      .heart-lost {
+        color: #4b5563;
+        filter: none;
+        transform: scale(0.8);
+      }
+
+      /* Modal Overlay */
+      .modal {
+        background: rgba(5, 8, 22, 0.9);
+        backdrop-filter: blur(8px);
+      }
+    </style>
+  </head>
+  <body
+    class="flex flex-col min-h-screen justify-between p-3 md:p-6 max-w-4xl mx-auto"
+  >
+    <header
+      class="w-full flex justify-between items-center bg-slate-900/80 border border-slate-700 rounded-2xl p-3 md:p-4 shadow-xl mb-4"
+    >
+      <!-- Điểm số -->
+      <div class="flex items-center space-x-2">
+        <span class="text-amber-400 font-bold text-sm md:text-base">ĐIỂM:</span>
+        <span
+          id="score-text"
+          class="text-2xl md:text-3xl font-extrabold text-yellow-300 drop-shadow"
+          >0</span
+        >
+      </div>
+
+      <!-- Mạng sống (3 Lần sai) -->
+      <div class="flex flex-col items-center">
+        <span class="text-xs text-slate-400 font-semibold mb-1"
+          >CƠ HỘI SAI</span
+        >
+        <div id="lives-container" class="flex space-x-1.5 text-2xl md:text-3xl">
+          <span class="heart">❤️</span>
+          <span class="heart">❤️</span>
+          <span class="heart">❤️</span>
+        </div>
+      </div>
+
+      <!-- Số câu hỏi -->
+      <div class="flex items-center space-x-2">
+        <span class="text-blue-400 font-bold text-sm md:text-base">CÂU:</span>
+        <span
+          id="question-num"
+          class="text-2xl md:text-3xl font-extrabold text-blue-300"
+          >1</span
+        >
+      </div>
+    </header>
+
+    <main
+      class="flex-1 flex flex-col justify-center items-center w-full space-y-4 md:space-y-6"
+    >
+      <!-- Trợ giúp & MC -->
+      <div class="w-full flex justify-between items-center px-2">
+        <!-- MC Cú Thông Thái Avatar -->
+        <div
+          class="flex items-center space-x-3 bg-slate-800/80 px-4 py-2 rounded-full border border-amber-500/50"
+        >
+          <div
+            class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-amber-500 flex items-center justify-center text-2xl border-2 border-white shadow"
+          >
+            🦉
+          </div>
+          <div>
+            <div class="text-xs text-amber-300 font-bold">Thầy Cú MC</div>
+            <div id="mc-speech" class="text-xs md:text-sm text-slate-200">
+              Hãy chọn đáp án đúng nhé!
+            </div>
+          </div>
+        </div>
+
+        <!-- Nút quyền trợ giúp -->
+        <div class="flex space-x-2">
+          <button
+            id="btn-5050"
+            onclick="use5050()"
+            class="lifeline-btn px-3 py-2 rounded-xl text-xs md:text-sm font-bold text-blue-200 flex flex-col items-center"
+            title="Bỏ 2 đáp án sai"
+          >
+            <span>50:50</span>
+          </button>
+          <button
+            id="btn-audience"
+            onclick="useAudienceHelp()"
+            class="lifeline-btn px-3 py-2 rounded-xl text-xs md:text-sm font-bold text-blue-200 flex flex-col items-center"
+            title="Hỏi khán giả"
+          >
+            <span>📊 Khán Giả</span>
+          </button>
+        </div>
+      </div>
+
+      <div
+        class="w-full question-box rounded-3xl p-6 md:p-8 text-center relative overflow-hidden"
+      >
+        <div
+          class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2"
+        >
+          Phép tính Lớp 1
+        </div>
+        <div
+          id="question-text"
+          class="text-3xl md:text-5xl font-black text-white tracking-wide leading-tight drop-shadow-md"
+        >
+          35 + 24 = ?
+        </div>
+      </div>
+
+      <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+        <button
+          onclick="selectOption(0)"
+          id="opt-0"
+          class="option-btn rounded-2xl p-4 md:p-5 text-left flex items-center space-x-4"
+        >
+          <span
+            class="bg-amber-500/20 text-amber-400 font-extrabold px-3 py-1.5 rounded-lg border border-amber-500/40 text-lg"
+            >A</span
+          >
+          <span
+            id="opt-text-0"
+            class="text-xl md:text-2xl font-bold text-slate-100 flex-1"
+            >59</span
+          >
+        </button>
+
+        <button
+          onclick="selectOption(1)"
+          id="opt-1"
+          class="option-btn rounded-2xl p-4 md:p-5 text-left flex items-center space-x-4"
+        >
+          <span
+            class="bg-amber-500/20 text-amber-400 font-extrabold px-3 py-1.5 rounded-lg border border-amber-500/40 text-lg"
+            >B</span
+          >
+          <span
+            id="opt-text-1"
+            class="text-xl md:text-2xl font-bold text-slate-100 flex-1"
+            >69</span
+          >
+        </button>
+
+        <button
+          onclick="selectOption(2)"
+          id="opt-2"
+          class="option-btn rounded-2xl p-4 md:p-5 text-left flex items-center space-x-4"
+        >
+          <span
+            class="bg-amber-500/20 text-amber-400 font-extrabold px-3 py-1.5 rounded-lg border border-amber-500/40 text-lg"
+            >C</span
+          >
+          <span
+            id="opt-text-2"
+            class="text-xl md:text-2xl font-bold text-slate-100 flex-1"
+            >58</span
+          >
+        </button>
+
+        <button
+          onclick="selectOption(3)"
+          id="opt-3"
+          class="option-btn rounded-2xl p-4 md:p-5 text-left flex items-center space-x-4"
+        >
+          <span
+            class="bg-amber-500/20 text-amber-400 font-extrabold px-3 py-1.5 rounded-lg border border-amber-500/40 text-lg"
+            >D</span
+          >
+          <span
+            id="opt-text-3"
+            class="text-xl md:text-2xl font-bold text-slate-100 flex-1"
+            >49</span
+          >
+        </button>
+      </div>
+    </main>
+
+    <footer class="mt-4 text-center text-xs text-slate-500">
+      Đúng: +10 điểm | Sai: -10 điểm & Mất 1 mạng | Hết 3 mạng = Thua
+    </footer>
+
+    <!-- Start Game Modal -->
+    <div
+      id="start-modal"
+      class="modal fixed inset-0 flex items-center justify-center p-4 z-50"
+    >
+      <div
+        class="bg-slate-900 border-2 border-amber-500 rounded-3xl p-6 md:p-8 max-w-md w-full text-center shadow-2xl space-y-6"
+      >
+        <div
+          class="w-20 h-20 bg-amber-500 rounded-full mx-auto flex items-center justify-center text-4xl shadow-lg border-4 border-yellow-300"
+        >
+          🦉
+        </div>
+        <div>
+          <h1 class="text-3xl font-extrabold text-amber-400 mb-2">
+            AI LÀ TRIỆU PHÚ
+          </h1>
+          <p class="text-blue-300 font-semibold">
+            Toán Lớp 1 (Cộng trừ không nhớ)
+          </p>
+        </div>
+        <div
+          class="bg-slate-800/90 rounded-2xl p-4 text-sm text-slate-300 space-y-2 text-left border border-slate-700"
+        >
+          <p class="flex items-center">
+            <span class="text-green-400 mr-2">✔️</span> Đúng mỗi câu:
+            <strong class="text-yellow-300 ml-1">+10 điểm</strong>
+          </p>
+          <p class="flex items-center">
+            <span class="text-red-400 mr-2">❌</span> Sai mỗi câu:
+            <strong class="text-red-300 ml-1">-10 điểm</strong>
+          </p>
+          <p class="flex items-center">
+            <span class="text-red-500 mr-2">💔</span> Sai 3 lần =
+            <strong class="text-red-400 ml-1">THUA CUỘC</strong>
+          </p>
+        </div>
+        <button
+          onclick="startGame()"
+          class="w-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-slate-950 font-black py-4 rounded-2xl text-xl shadow-lg transform active:scale-95 transition"
+        >
+          BẮT ĐẦU CHƠI NGAY
+        </button>
+      </div>
+    </div>
+
+    <!-- Audience Help Modal -->
+    <div
+      id="audience-modal"
+      class="modal fixed inset-0 flex items-center justify-center p-4 z-50 hidden"
+    >
+      <div
+        class="bg-slate-900 border-2 border-blue-500 rounded-3xl p-6 max-w-md w-full text-center shadow-2xl space-y-6"
+      >
+        <h3 class="text-2xl font-bold text-blue-400">📊 Khán Giả Bình Chọn</h3>
+        <div class="space-y-3" id="audience-bars">
+          <!-- Bar item generated dynamically -->
+        </div>
+        <button
+          onclick="closeAudienceModal()"
+          class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-6 rounded-xl"
+        >
+          Đóng
+        </button>
+      </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div
+      id="gameover-modal"
+      class="modal fixed inset-0 flex items-center justify-center p-4 z-50 hidden"
+    >
+      <div
+        class="bg-slate-900 border-2 border-red-500 rounded-3xl p-6 md:p-8 max-w-md w-full text-center shadow-2xl space-y-6"
+      >
+        <div class="text-6xl">😭</div>
+        <div>
+          <h2 class="text-3xl font-extrabold text-red-500 mb-1">
+            BẠN ĐÃ THUA!
+          </h2>
+          <p class="text-slate-400 text-sm">Bạn đã trả lời sai 3 lần.</p>
+        </div>
+        <div
+          class="bg-slate-800 rounded-2xl p-4 border border-slate-700 space-y-2"
+        >
+          <div class="text-slate-400 text-sm">Tổng điểm đạt được:</div>
+          <div id="final-score" class="text-4xl font-extrabold text-yellow-400">
+            0
+          </div>
+          <div class="text-xs text-slate-400 mt-2">
+            Số câu trả lời đúng:
+            <span id="final-correct-count" class="text-green-400 font-bold"
+              >0</span
+            >
+          </div>
+        </div>
+        <button
+          onclick="startGame()"
+          class="w-full bg-gradient-to-r from-green-500 to-emerald-400 hover:from-green-600 hover:to-emerald-500 text-slate-950 font-black py-4 rounded-2xl text-xl shadow-lg transform active:scale-95 transition"
+        >
+          CHƠI LẠI TỪ ĐẦU
+        </button>
+      </div>
+    </div>
+
+    <script>
+      let synth, winSynth, loseSynth;
+      let audioReady = false;
+
+      function initAudio() {
+        if (audioReady) return;
+        try {
+          Tone.start();
+          synth = new Tone.Synth().toDestination();
+          winSynth = new Tone.PolySynth(Tone.Synth).toDestination();
+          loseSynth = new Tone.MembraneSynth().toDestination();
+          audioReady = true;
+        } catch (e) {
+          console.log("Audio init failed:", e);
+        }
+      }
+
+      function playSound(type) {
+        if (!audioReady) return;
+        try {
+          if (type === "select") synth.triggerAttackRelease("E4", "16n");
+          if (type === "correct")
+            winSynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+          if (type === "wrong") loseSynth.triggerAttackRelease("C2", "4n");
+          if (type === "gameover") loseSynth.triggerAttackRelease("G1", "2n");
+        } catch (e) {}
+      }
+
+      let score = 0;
+      let wrongCount = 0;
+      let questionNum = 1;
+      let correctAnswersCount = 0;
+      let currentProblem = null;
+      let isAnswering = false;
+      let used5050 = false;
+      let usedAudience = false;
+
+      // Grade 1 Math Generator (Range 0-100, no carrying/borrowing)
+      function generateMathProblem() {
+        const isAdd = Math.random() > 0.5;
+        let a, b, answer;
+
+        if (isAdd) {
+          let tens1 = Math.floor(Math.random() * 8) + 1; // 1-8
+          let tens2 = Math.floor(Math.random() * (9 - tens1)) + 1; // ensures sum <= 9
+          let ones1 = Math.floor(Math.random() * 9); // 0-8
+          let ones2 = Math.floor(Math.random() * (10 - ones1)); // ensures sum <= 9
+
+          a = tens1 * 10 + ones1;
+          b = tens2 * 10 + ones2;
+          answer = a + b;
+        } else {
+          let tens1 = Math.floor(Math.random() * 8) + 2; // 2-9
+          let tens2 = Math.floor(Math.random() * (tens1 - 1)) + 1; // tens1 - tens2 >= 1
+          let ones1 = Math.floor(Math.random() * 9) + 1; // 1-9
+          let ones2 = Math.floor(Math.random() * (ones1 + 1)); // ones1 >= ones2
+
+          a = tens1 * 10 + ones1;
+          b = tens2 * 10 + ones2;
+          answer = a - b;
+        }
+
+        // Generate 3 unique wrong options
+        let options = [answer];
+        while (options.length < 4) {
+          let delta =
+            (Math.floor(Math.random() * 4) + 1) *
+            (Math.random() > 0.5 ? 1 : -1);
+          if (Math.random() > 0.5) delta *= 10; // offset tens
+
+          let wrongVal = answer + delta;
+          if (wrongVal >= 0 && wrongVal <= 100 && !options.includes(wrongVal)) {
+            options.push(wrongVal);
+          }
+        }
+
+        // Shuffle options
+        let shuffled = options
+          .map((value) => ({ value, sort: Math.random() }))
+          .sort((a, b) => a.sort - b.sort)
+          .map((item) => item.value);
+
+        let correctIndex = shuffled.indexOf(answer);
+
+        return {
+          text: `${a} ${isAdd ? "+" : "-"} ${b} = ?`,
+          answer: answer,
+          options: shuffled,
+          correctIndex: correctIndex,
+        };
+      }
+
+      function updateUI() {
+        document.getElementById("score-text").innerText = score;
+        document.getElementById("question-num").innerText = questionNum;
+
+        // Update Hearts
+        const heartsContainer = document.getElementById("lives-container");
+        const hearts = heartsContainer.children;
+        for (let i = 0; i < 3; i++) {
+          if (i < 3 - wrongCount) {
+            hearts[i].className = "heart";
+            hearts[i].innerText = "❤️";
+          } else {
+            hearts[i].className = "heart-lost";
+            hearts[i].innerText = "🖤";
+          }
+        }
+
+        // Lifeline button states
+        document.getElementById("btn-5050").disabled = used5050;
+        document.getElementById("btn-audience").disabled = usedAudience;
+      }
+
+      function loadNextQuestion() {
+        isAnswering = false;
+        currentProblem = generateMathProblem();
+
+        document.getElementById("question-text").innerText =
+          currentProblem.text;
+        document.getElementById("mc-speech").innerText =
+          `Câu hỏi số ${questionNum}. Suy nghĩ kỹ nhé!`;
+
+        for (let i = 0; i < 4; i++) {
+          const btn = document.getElementById(`opt-${i}`);
+          const textSpan = document.getElementById(`opt-text-${i}`);
+
+          btn.className =
+            "option-btn rounded-2xl p-4 md:p-5 text-left flex items-center space-x-4";
+          btn.disabled = false;
+          btn.style.visibility = "visible";
+          textSpan.innerText = currentProblem.options[i];
+        }
+      }
+
+      function selectOption(index) {
+        if (isAnswering) return;
+        isAnswering = true;
+        initAudio();
+        playSound("select");
+
+        const selectedBtn = document.getElementById(`opt-${index}`);
+        selectedBtn.classList.add("selected");
+        document.getElementById("mc-speech").innerText =
+          "Đó là câu trả lời cuối cùng của bạn?";
+
+        // Wait 1.2s for suspense effect
+        setTimeout(() => {
+          selectedBtn.classList.remove("selected");
+
+          if (index === currentProblem.correctIndex) {
+            // Correct!
+            selectedBtn.classList.add("correct");
+            playSound("correct");
+            score += 10;
+            correctAnswersCount++;
+            document.getElementById("mc-speech").innerText =
+              "CHÍNH XÁC! Tuyệt vời quá! (+10 điểm)";
+
+            setTimeout(() => {
+              questionNum++;
+              updateUI();
+              loadNextQuestion();
+            }, 1500);
+          } else {
+            // Wrong!
+            selectedBtn.classList.add("wrong");
+            playSound("wrong");
+
+            // Highlight correct answer
+            const correctBtn = document.getElementById(
+              `opt-${currentProblem.correctIndex}`,
+            );
+            correctBtn.classList.add("correct");
+
+            score = Math.max(0, score - 10); // Deduct 10 points
+            wrongCount++;
+            document.getElementById("mc-speech").innerText =
+              `Rất tiếc, câu trả lời đúng là ${currentProblem.answer}. (-10 điểm)`;
+
+            updateUI();
+
+            setTimeout(() => {
+              if (wrongCount >= 3) {
+                // Game Over
+                gameOver();
+              } else {
+                questionNum++;
+                loadNextQuestion();
+              }
+            }, 2000);
+          }
+        }, 1200);
+      }
+
+      function use5050() {
+        if (used5050 || isAnswering) return;
+        used5050 = true;
+        initAudio();
+        playSound("select");
+
+        let wrongIndices = [];
+        for (let i = 0; i < 4; i++) {
+          if (i !== currentProblem.correctIndex) wrongIndices.push(i);
+        }
+
+        // Shuffle and hide 2 wrong options
+        wrongIndices.sort(() => Math.random() - 0.5);
+        document.getElementById(`opt-${wrongIndices[0]}`).style.visibility =
+          "hidden";
+        document.getElementById(`opt-${wrongIndices[1]}`).style.visibility =
+          "hidden";
+
+        document.getElementById("mc-speech").innerText =
+          "Thầy Cú đã loại bỏ 2 phương án sai!";
+        updateUI();
+      }
+
+      function useAudienceHelp() {
+        if (usedAudience || isAnswering) return;
+        usedAudience = true;
+        initAudio();
+        playSound("select");
+
+        const correctIdx = currentProblem.correctIndex;
+        let percentages = [0, 0, 0, 0];
+
+        // Give highest percentage to correct option (60% - 85%)
+        let correctPct = Math.floor(Math.random() * 26) + 60;
+        percentages[correctIdx] = correctPct;
+
+        let remaining = 100 - correctPct;
+        let otherIndices = [0, 1, 2, 3].filter((i) => i !== correctIdx);
+
+        for (let i = 0; i < otherIndices.length - 1; i++) {
+          let part = Math.floor(Math.random() * (remaining + 1));
+          percentages[otherIndices[i]] = part;
+          remaining -= part;
+        }
+        percentages[otherIndices[otherIndices.length - 1]] = remaining;
+
+        // Build chart HTML
+        const labels = ["A", "B", "C", "D"];
+        let html = "";
+        for (let i = 0; i < 4; i++) {
+          html += `
+                    <div class="flex items-center space-x-3 text-sm">
+                        <span class="font-bold text-amber-400 w-4">${labels[i]}</span>
+                        <div class="flex-1 bg-slate-800 rounded-full h-4 overflow-hidden border border-slate-700">
+                            <div class="bg-blue-500 h-full rounded-full transition-all duration-500" style="width: ${percentages[i]}%"></div>
+                        </div>
+                        <span class="w-12 text-right font-bold text-slate-300">${percentages[i]}%</span>
+                    </div>
+                `;
+        }
+
+        document.getElementById("audience-bars").innerHTML = html;
+        document.getElementById("audience-modal").classList.remove("hidden");
+        updateUI();
+      }
+
+      function closeAudienceModal() {
+        document.getElementById("audience-modal").classList.add("hidden");
+      }
+
+      function startGame() {
+        initAudio();
+        score = 0;
+        wrongCount = 0;
+        questionNum = 1;
+        correctAnswersCount = 0;
+        used5050 = false;
+        usedAudience = false;
+
+        document.getElementById("start-modal").classList.add("hidden");
+        document.getElementById("gameover-modal").classList.add("hidden");
+
+        updateUI();
+        loadNextQuestion();
+      }
+
+      function gameOver() {
+        playSound("gameover");
+        document.getElementById("final-score").innerText = score;
+        document.getElementById("final-correct-count").innerText =
+          correctAnswersCount;
+        document.getElementById("gameover-modal").classList.remove("hidden");
+      }
+    </script>
+  </body>
+</html>
