@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
     />
     <title>Học Toán Lớp 2 - Vui Học Mỗi Ngày</title>
     <!-- Tailwind CSS -->
@@ -13,28 +13,195 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <!-- Canvas Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- Google Fonts -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@600;800;900&display=swap"
-      rel="stylesheet"
-    />
-
     <style>
+      :root {
+        --font-ui: "Segoe UI", Tahoma, Arial, sans-serif;
+        --font-display: "Trebuchet MS", "Segoe UI", Tahoma, Arial, sans-serif;
+        font-family: var(--font-ui);
+      }
+
+      *,
+      button {
+        font-family: inherit;
+        font-synthesis: none;
+      }
+
       body {
-        font-family: "Nunito", sans-serif;
-        background: linear-gradient(
-          135deg,
-          #e0f2fe 0%,
-          #f0fdf4 50%,
-          #fef3c7 100%
-        );
+        background-color: #f8fafc;
+        background-image:
+          linear-gradient(135deg, rgba(224, 242, 254, 0.9), transparent 45%),
+          radial-gradient(
+            circle at 90% 10%,
+            rgba(254, 243, 199, 0.85),
+            transparent 28%
+          ),
+          linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+        background-size:
+          auto,
+          auto,
+          28px 28px,
+          28px 28px;
         min-height: 100vh;
         user-select: none;
         -webkit-user-select: none;
+        text-rendering: optimizeLegibility;
+        overflow-x: hidden;
+      }
+
+      button,
+      [onclick] {
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      }
+
+      button:focus-visible,
+      [onclick]:focus-visible {
+        outline: 4px solid #38bdf8;
+        outline-offset: 3px;
+      }
+
+      main {
+        width: 100%;
+      }
+
+      #view-topics > div:first-child {
+        padding: 0.5rem 0.5rem 0;
+      }
+
+      #view-topics .grid > [onclick] {
+        display: flex;
+        min-height: 220px;
+        flex-direction: column;
+        justify-content: flex-start;
+        box-shadow:
+          0 8px 0 rgba(15, 23, 42, 0.08),
+          0 16px 28px rgba(15, 23, 42, 0.08);
+      }
+
+      #view-topics .grid > [onclick] > div:last-child {
+        margin-top: auto;
+      }
+
+      #view-topics .grid > [onclick]:hover {
+        box-shadow:
+          0 12px 0 rgba(15, 23, 42, 0.08),
+          0 20px 32px rgba(15, 23, 42, 0.12);
+      }
+
+      #view-topics h3 {
+        line-height: 1.25;
+      }
+
+      #view-quiz > div:first-child {
+        position: sticky;
+        top: 0.75rem;
+        z-index: 10;
+        backdrop-filter: blur(12px);
+      }
+
+      #question-text {
+        overflow-wrap: anywhere;
+      }
+
+      .keypad-btn,
+      .btn-choice,
+      #btn-submit-twostep,
+      #btn-submit-early {
+        min-height: 48px;
+      }
+
+      @media (min-width: 768px) {
+        body {
+          padding-top: 2rem;
+          padding-bottom: 2rem;
+        }
+
+        #view-topics .grid > [onclick] {
+          min-height: 240px;
+        }
       }
 
       .font-fredoka {
-        font-family: "Fredoka", cursive;
+        font-family: var(--font-display);
+        letter-spacing: 0;
+      }
+
+      .border-3 {
+        border-width: 3px;
+      }
+
+      header {
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 0.75rem;
+        }
+
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.75rem;
+        }
+
+        header > div:last-child {
+          width: 100%;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+        }
+
+        header > div:last-child > div {
+          padding-left: 0.6rem;
+          padding-right: 0.6rem;
+        }
+
+        #view-topics {
+          gap: 1.25rem;
+        }
+
+        #view-topics h2 {
+          font-size: 1.8rem;
+          line-height: 1.15;
+        }
+
+        #view-topics .grid {
+          gap: 0.85rem;
+        }
+
+        #view-topics .grid > [onclick] {
+          min-height: 0;
+          padding: 1rem;
+        }
+
+        #view-topics .grid > [onclick] h3 {
+          font-size: 1.05rem;
+        }
+
+        #view-topics > div:last-child {
+          padding: 1rem;
+        }
+
+        #view-quiz > div:first-child {
+          top: 0.5rem;
+          padding: 0.65rem;
+        }
+
+        #quiz-badge {
+          max-width: 7rem;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        #question-text {
+          font-size: 1.25rem;
+        }
+
+        #view-summary {
+          padding: 1.25rem;
+        }
       }
 
       .card-bounce {
@@ -87,7 +254,7 @@
         background: #ffffff;
         border: 2px solid #cbd5e1;
         box-shadow: 0 4px 0 #94a3b8;
-        font-family: "Fredoka", cursive;
+        font-family: var(--font-display);
         font-size: 1.5rem;
         font-weight: bold;
         color: #334155;
@@ -138,7 +305,7 @@
       class="w-full flex justify-between items-center bg-white/90 backdrop-blur-md border-4 border-amber-300 rounded-3xl p-3 md:p-4 shadow-lg mb-4"
     >
       <button
-        onclick="showTopicSelection()"
+        onclick="confirmExitQuiz()"
         class="flex items-center space-x-2 text-left group"
       >
         <div
@@ -156,7 +323,20 @@
         </div>
       </button>
 
-      <div class="flex items-center space-x-3 md:space-x-6">
+      <div class="flex items-center space-x-2 md:space-x-4">
+        <!-- Timer Badge (Active in Timed Mode) -->
+        <div
+          id="header-timer-box"
+          class="hidden flex items-center space-x-1.5 bg-rose-100 border-2 border-rose-400 px-3 py-1.5 rounded-2xl animate-pulse"
+        >
+          <span class="text-xl">⏱️</span>
+          <span
+            id="header-timer-text"
+            class="font-fredoka text-lg md:text-xl font-bold text-rose-700"
+            >45:00</span
+          >
+        </div>
+
         <div
           class="flex items-center space-x-1.5 bg-amber-100 border-2 border-amber-400 px-3 py-1.5 rounded-2xl"
         >
@@ -181,7 +361,7 @@
     </header>
 
     <main class="flex-1 flex flex-col justify-center">
-      <!-- VIEW 1: TOPIC SELECTION SCREEN (8 Topics Grid) -->
+      <!-- VIEW 1: TOPIC SELECTION SCREEN (8 Topics Grid + 1 Exam Mode) -->
       <div id="view-topics" class="space-y-6">
         <div class="text-center space-y-2">
           <h2
@@ -190,8 +370,8 @@
             Em muốn học chủ đề nào?
           </h2>
           <p class="text-slate-500 font-semibold text-sm md:text-base">
-            Mỗi bài học gồm 15 câu hỏi không lặp lại - Học vui và rèn luyện trí
-            tuệ!
+            Mỗi bài học gồm 20 câu hỏi không lặp lại - Chấm điểm thang điểm 10
+            chuẩn mực!
           </p>
         </div>
 
@@ -217,11 +397,10 @@
               Số & So sánh phạm vi 100
             </h3>
             <p class="text-slate-500 text-xs font-semibold leading-relaxed">
-              Đọc viết số, số liền trước/sau, so sánh <, >, =, cấu tạo số chục &
-              đơn vị.
+              Đọc viết số, số liền trước/sau, so sánh & cấu tạo số chục, đơn vị.
             </p>
             <div class="mt-3 flex items-center text-blue-600 font-bold text-xs">
-              <span>Luyện tập 15 câu</span>
+              <span>Luyện tập 20 câu</span>
               <span class="ml-1 group-hover:translate-x-1 transition">➔</span>
             </div>
           </div>
@@ -244,17 +423,17 @@
               Cộng & Trừ KHÔNG nhớ
             </h3>
             <p class="text-slate-500 text-xs font-semibold leading-relaxed">
-              Cộng trừ nhẩm phạm vi 20 & 100 không nhớ, tính tròn chục siêu tốc!
+              Cộng trừ nhẩm phạm vi 20 & 100 không nhớ, cộng trừ tròn chục.
             </p>
             <div
               class="mt-3 flex items-center text-emerald-600 font-bold text-xs"
             >
-              <span>Luyện tập 15 câu</span>
+              <span>Luyện tập 20 câu</span>
               <span class="ml-1 group-hover:translate-x-1 transition">➔</span>
             </div>
           </div>
 
-          <!-- Topic 3 (New Split) -->
+          <!-- Topic 3 -->
           <div
             onclick="startQuiz(3)"
             class="card-bounce bg-white border-4 border-rose-400 rounded-3xl p-5 cursor-pointer shadow-xl relative overflow-hidden group"
@@ -272,15 +451,15 @@
               Cộng & Trừ CÓ nhớ
             </h3>
             <p class="text-slate-500 text-xs font-semibold leading-relaxed">
-              Cộng qua 10, trừ qua 10, cộng trừ có nhớ trong phạm vi 20 và 100.
+              Cộng qua 10, trừ qua 10, đặt tính cộng trừ có nhớ phạm vi 100.
             </p>
             <div class="mt-3 flex items-center text-rose-600 font-bold text-xs">
-              <span>Luyện tập 15 câu</span>
+              <span>Luyện tập 20 câu</span>
               <span class="ml-1 group-hover:translate-x-1 transition">➔</span>
             </div>
           </div>
 
-          <!-- Topic 4 (New Split) -->
+          <!-- Topic 4 -->
           <div
             onclick="startQuiz(4)"
             class="card-bounce bg-white border-4 border-teal-400 rounded-3xl p-5 cursor-pointer shadow-xl relative overflow-hidden group"
@@ -295,14 +474,14 @@
               >Chủ đề 4</span
             >
             <h3 class="font-fredoka text-lg font-bold text-slate-800 mb-1">
-              Phép tính Phạm vi 100
+              Biểu thức & Tìm X
             </h3>
             <p class="text-slate-500 text-xs font-semibold leading-relaxed">
-              Tính giá trị biểu thức 2 bước, tìm X chưa biết, tổng hiệu số lớn
-              nhất/nhỏ nhất.
+              Tính giá trị biểu thức 2 bước, tìm X chưa biết, tổng hiệu số đặc
+              biệt.
             </p>
             <div class="mt-3 flex items-center text-teal-600 font-bold text-xs">
-              <span>Luyện tập 15 câu</span>
+              <span>Luyện tập 20 câu</span>
               <span class="ml-1 group-hover:translate-x-1 transition">➔</span>
             </div>
           </div>
@@ -331,12 +510,12 @@
             <div
               class="mt-3 flex items-center text-amber-600 font-bold text-xs"
             >
-              <span>Luyện tập 15 câu</span>
+              <span>Luyện tập 20 câu</span>
               <span class="ml-1 group-hover:translate-x-1 transition">➔</span>
             </div>
           </div>
 
-          <!-- Topic 6 -->
+          <!-- Topic 6 (Expanded: Hours, Days, Weeks, Months, Years) -->
           <div
             onclick="startQuiz(6)"
             class="card-bounce bg-white border-4 border-purple-400 rounded-3xl p-5 cursor-pointer shadow-xl relative overflow-hidden group"
@@ -344,23 +523,23 @@
             <div
               class="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center text-2xl border-2 border-purple-300 mb-3"
             >
-              🕒
+              📅
             </div>
             <span
               class="inline-block bg-purple-100 text-purple-700 font-bold text-xs px-3 py-1 rounded-full mb-2"
               >Chủ đề 6</span
             >
             <h3 class="font-fredoka text-lg font-bold text-slate-800 mb-1">
-              Đại lượng & Đo lường
+              Đại lượng & Thời gian
             </h3>
             <p class="text-slate-500 text-xs font-semibold leading-relaxed">
-              Xem đồng hồ, đo độ dài (cm, dm, m), khối lượng (kg), dung tích
-              (l), Tiền Việt Nam.
+              Đồng hồ, Giờ - Ngày - Thứ - Tháng - Năm, độ dài (cm, dm, m), kg,
+              lít.
             </p>
             <div
               class="mt-3 flex items-center text-purple-600 font-bold text-xs"
             >
-              <span>Luyện tập 15 câu</span>
+              <span>Luyện tập 20 câu</span>
               <span class="ml-1 group-hover:translate-x-1 transition">➔</span>
             </div>
           </div>
@@ -383,11 +562,10 @@
               Hình học trực quan
             </h3>
             <p class="text-slate-500 text-xs font-semibold leading-relaxed">
-              Điểm, đoạn thẳng, hình tam giác, tứ giác, tính độ dài đường gấp
-              khúc.
+              Điểm, đoạn thẳng, hình tam giác, tứ giác, độ dài đường gấp khúc.
             </p>
             <div class="mt-3 flex items-center text-pink-600 font-bold text-xs">
-              <span>Luyện tập 15 câu</span>
+              <span>Luyện tập 20 câu</span>
               <span class="ml-1 group-hover:translate-x-1 transition">➔</span>
             </div>
           </div>
@@ -410,42 +588,47 @@
               Giải toán 2 bước
             </h3>
             <p class="text-slate-500 text-xs font-semibold leading-relaxed">
-              Thực hành 2 bước: Bước 1 Chọn phép tính thích hợp, Bước 2 Điền kết
-              quả!
+              Bước 1 Chọn phép tính thích hợp, Bước 2 Điền kết quả bài toán!
             </p>
             <div
               class="mt-3 flex items-center text-indigo-600 font-bold text-xs"
             >
-              <span>Luyện tập 15 câu</span>
+              <span>Luyện tập 20 câu</span>
               <span class="ml-1 group-hover:translate-x-1 transition">➔</span>
             </div>
           </div>
         </div>
 
-        <!-- All Topics Mix Button -->
+        <!-- COMPREHENSIVE EXAM MODE BUTTON (Kiểm Tra Tổng Hợp) -->
         <div
           onclick="startQuiz(0)"
-          class="card-bounce bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 border-4 border-amber-300 rounded-3xl p-5 cursor-pointer shadow-xl text-white flex items-center justify-between"
+          class="card-bounce bg-gradient-to-r from-red-500 via-amber-500 to-indigo-600 border-4 border-amber-300 rounded-3xl p-6 cursor-pointer shadow-2xl text-white flex flex-col md:flex-row items-center justify-between gap-4"
         >
           <div class="flex items-center space-x-4">
             <div
-              class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-3xl"
+              class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-4xl shadow-inner"
             >
               🏆
             </div>
             <div>
-              <h3 class="font-fredoka text-2xl font-bold">
-                Thử Thách Tổng Hợp (Tất cả 8 chủ đề)
+              <div
+                class="inline-block bg-red-800/60 text-amber-200 text-xs font-extrabold px-3 py-0.5 rounded-full mb-1"
+              >
+                BÀI THI TỔNG HỢP CHUẨN
+              </div>
+              <h3 class="font-fredoka text-2xl md:text-3xl font-bold">
+                Kiểm Tra Tổng Hợp
               </h3>
-              <p class="text-amber-100 text-xs font-semibold">
-                Gồm 15 câu hỏi trộn lẫn ngẫu nhiên, không lặp lại!
+              <p class="text-amber-100 text-xs md:text-sm font-semibold">
+                Gồm 30 câu hỏi ngẫu nhiên từ 8 chủ đề • Thời gian 45 phút • Tính
+                điểm thang 10 & Nộp bài sớm!
               </p>
             </div>
           </div>
           <div
-            class="bg-white text-amber-600 font-fredoka px-5 py-2.5 rounded-2xl font-bold shadow-md"
+            class="bg-white text-rose-600 hover:bg-amber-50 font-fredoka px-6 py-3 rounded-2xl font-bold text-lg shadow-lg whitespace-nowrap"
           >
-            Bắt đầu 🚀
+            Bắt đầu Thi (45 Phút) 🚀
           </div>
         </div>
       </div>
@@ -457,17 +640,20 @@
           class="flex items-center justify-between bg-white border-2 border-slate-200 rounded-2xl p-3 shadow-sm"
         >
           <button
-            onclick="showTopicSelection()"
-            class="text-slate-400 hover:text-slate-600 font-bold text-sm flex items-center"
+            onclick="confirmExitQuiz()"
+            class="text-slate-500 hover:text-slate-800 font-bold text-xs md:text-sm flex items-center space-x-1"
           >
-            ← Đổi chủ đề
+            <span>←</span>
+            <span class="hidden sm:inline">Trở về</span>
+            <span>Menu</span>
           </button>
-          <div class="flex-1 max-w-xs mx-4">
+
+          <div class="flex-1 max-w-xs mx-3">
             <div
               class="flex justify-between text-xs font-bold text-slate-500 mb-1"
             >
               <span>CÂU HỎI</span>
-              <span id="quiz-progress-text">1 / 15</span>
+              <span id="quiz-progress-text">1 / 20</span>
             </div>
             <div
               class="w-full bg-slate-100 rounded-full h-3 overflow-hidden border border-slate-200"
@@ -475,15 +661,27 @@
               <div
                 id="quiz-progress-bar"
                 class="bg-amber-400 h-full rounded-full transition-all duration-300"
-                style="width: 6.6%"
+                style="width: 5%"
               ></div>
             </div>
           </div>
-          <div
-            id="quiz-badge"
-            class="bg-blue-100 text-blue-700 font-bold text-xs px-3 py-1 rounded-xl"
-          >
-            Chủ đề 1
+
+          <div class="flex items-center space-x-2">
+            <div
+              id="quiz-badge"
+              class="bg-blue-100 text-blue-700 font-bold text-xs px-3 py-1.5 rounded-xl"
+            >
+              Chủ đề 1
+            </div>
+
+            <!-- Early Submit Button -->
+            <button
+              onclick="submitQuizEarly()"
+              id="btn-submit-early"
+              class="bg-rose-500 hover:bg-rose-600 text-white font-fredoka font-bold text-xs px-3 py-1.5 rounded-xl shadow-md card-bounce"
+            >
+              Nộp Bài Sớm 🏁
+            </button>
           </div>
         </div>
 
@@ -507,7 +705,7 @@
                 id="mascot-speech"
                 class="text-xs text-slate-600 font-semibold mt-1"
               >
-                Hãy đọc kỹ đề bài và trả lời nhé!
+                Hãy đọc kỹ đề bài và chọn đáp án chính xác nhé!
               </div>
             </div>
           </div>
@@ -839,45 +1037,81 @@
         </div>
       </div>
 
-      <!-- VIEW 3: SUMMARY / RESULTS SCREEN -->
+      <!-- VIEW 3: SUMMARY / RESULTS SCREEN (10-Point Scale) -->
       <div
         id="view-summary"
-        class="hidden bg-white border-4 border-amber-400 rounded-3xl p-6 md:p-8 shadow-2xl text-center space-y-6 max-w-lg mx-auto animate-pop"
+        class="hidden bg-white border-4 border-amber-400 rounded-3xl p-6 md:p-8 shadow-2xl text-center space-y-6 max-w-xl mx-auto animate-pop"
       >
         <div
+          id="summary-badge-icon"
           class="w-24 h-24 bg-amber-100 rounded-full flex items-center justify-center text-6xl mx-auto border-4 border-amber-300 shadow-inner"
         >
           🏆
         </div>
 
         <div class="space-y-1">
-          <h2 class="font-fredoka text-3xl font-bold text-slate-800">
-            HOÀN THÀNH BÀI HỌC!
+          <h2
+            id="summary-header-title"
+            class="font-fredoka text-3xl font-bold text-slate-800"
+          >
+            KẾT QUẢ BÀI THI
           </h2>
-          <p class="text-slate-500 font-semibold text-sm">
-            Em đã hoàn thành xuất sắc 15 câu hỏi!
+          <p id="summary-subtext" class="text-slate-500 font-semibold text-sm">
+            Em đã hoàn thành bài thi rất xuất sắc!
           </p>
         </div>
 
+        <!-- 10-Point Score Display Banner -->
         <div
-          class="grid grid-cols-2 gap-3 bg-slate-50 border-2 border-slate-200 rounded-2xl p-4"
+          class="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-3xl p-6 text-white shadow-lg space-y-2"
+        >
+          <div
+            class="text-xs font-extrabold uppercase tracking-widest text-amber-100"
+          >
+            Điểm Số Thang Điểm 10
+          </div>
+          <div
+            class="font-fredoka text-5xl md:text-6xl font-extrabold tracking-tight"
+            id="sum-scale10"
+          >
+            10 / 10
+          </div>
+          <div
+            id="sum-rating-text"
+            class="font-fredoka text-lg font-bold text-amber-100"
+          >
+            🌟 Xuất Sắc! Điểm Tuyệt Đối!
+          </div>
+        </div>
+
+        <div
+          class="grid grid-cols-3 gap-3 bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 text-center"
         >
           <div class="space-y-1">
-            <div class="text-xs text-slate-400 font-bold">CÂU TRẢ LỜI ĐÚNG</div>
+            <div class="text-xs text-slate-400 font-bold">CÂU ĐÚNG</div>
             <div
               id="sum-correct"
-              class="font-fredoka text-3xl font-bold text-emerald-600"
+              class="font-fredoka text-2xl font-bold text-emerald-600"
             >
-              15 / 15
+              20 / 20
             </div>
           </div>
           <div class="space-y-1">
-            <div class="text-xs text-slate-400 font-bold">TỔNG ĐIỂM THƯỞNG</div>
+            <div class="text-xs text-slate-400 font-bold">TỶ LỆ ĐÚNG</div>
             <div
-              id="sum-score"
-              class="font-fredoka text-3xl font-bold text-amber-500"
+              id="sum-percent"
+              class="font-fredoka text-2xl font-bold text-blue-600"
             >
-              +150 ⭐
+              100%
+            </div>
+          </div>
+          <div class="space-y-1">
+            <div class="text-xs text-slate-400 font-bold">THỜI GIAN</div>
+            <div
+              id="sum-time-spent"
+              class="font-fredoka text-2xl font-bold text-amber-500"
+            >
+              03:15
             </div>
           </div>
         </div>
@@ -885,21 +1119,21 @@
         <div class="flex space-x-3">
           <button
             onclick="showTopicSelection()"
-            class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-fredoka font-bold py-3 rounded-2xl border-2 border-slate-300"
+            class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-fredoka font-bold py-3.5 rounded-2xl border-2 border-slate-300"
           >
             Chọn Chủ Đề
           </button>
           <button
             onclick="restartQuiz()"
-            class="flex-1 bg-amber-500 hover:bg-amber-400 text-white font-fredoka font-bold py-3 rounded-2xl shadow-lg card-bounce"
+            class="flex-1 bg-amber-500 hover:bg-amber-400 text-white font-fredoka font-bold py-3.5 rounded-2xl shadow-lg card-bounce"
           >
-            Thử Lại 🔄
+            Làm Lại Bài 🔄
           </button>
         </div>
       </div>
     </main>
 
-    <!-- JavaScript Logic & Question Generator -->
+    <!-- JavaScript Logic & Dynamic Question Generator -->
     <script>
       // --- AUDIO SYNTHESIS SETUP (Tone.js) ---
       let audioInit = false;
@@ -938,11 +1172,18 @@
       let totalScore = 0;
       let currentStreak = 0;
       let currentTopic = 1;
+      let totalQuestionsInQuiz = 20; // 20 for standard topics, 30 for exam mode
       let currentQuestions = [];
       let questionIndex = 0;
       let correctCount = 0;
       let userFillInput = "";
       let isAnswered = false;
+
+      // Timer State
+      let timerInterval = null;
+      let timerSecondsRemaining = 2700; // 45 minutes = 2700 seconds
+      let startTimeStamp = 0;
+      let timeSpentSeconds = 0;
 
       // Two-step specific state
       let twoStepSelectedEq = null;
@@ -961,6 +1202,8 @@
         "Lan",
         "Tuấn",
         "Vy",
+        "Khánh",
+        "Trang",
       ];
       const items = [
         "quả táo",
@@ -970,9 +1213,10 @@
         "viên bi",
         "con tem",
         "quả cam",
+        "chiếc bút",
       ];
 
-      // --- VISUAL GENERATORS (SVG Clock, SVG Shapes, SVG Broken Lines) ---
+      // --- VISUAL GENERATORS (SVG Clock, Shapes, Polylines) ---
 
       function renderAnalogClockSVG(hours, minutes) {
         const minuteAngle = minutes * 6;
@@ -1062,7 +1306,7 @@
         return "";
       }
 
-      // --- DYNAMIC QUESTION GENERATORS FOR ALL 8 TOPICS ---
+      // --- DYNAMIC QUESTION GENERATORS FOR ALL TOPICS ---
 
       // TOPIC 1: Số & So sánh phạm vi 100
       function generateTopic1Question() {
@@ -1070,7 +1314,6 @@
         const isMCQ = Math.random() > 0.4;
 
         if (mode === 0) {
-          // Liền trước / Liền sau
           const isBefore = Math.random() > 0.5;
           const num = Math.floor(Math.random() * 80) + 15;
           const ans = isBefore ? num - 1 : num + 1;
@@ -1085,7 +1328,6 @@
             options: generateMCQOptions(ans),
           };
         } else if (mode === 1) {
-          // So sánh hai số
           const a = Math.floor(Math.random() * 85) + 10;
           let b = Math.floor(Math.random() * 85) + 10;
           if (Math.random() < 0.25) b = a;
@@ -1105,7 +1347,6 @@
             ],
           };
         } else if (mode === 2) {
-          // Cấu tạo số (Chục và đơn vị)
           const tens = Math.floor(Math.random() * 8) + 1;
           const units = Math.floor(Math.random() * 9) + 1;
           const total = tens * 10 + units;
@@ -1119,7 +1360,6 @@
             options: generateMCQOptions(total),
           };
         } else if (mode === 3) {
-          // Số chục của số...
           const tens = Math.floor(Math.random() * 8) + 2;
           const units = Math.floor(Math.random() * 9);
           const num = tens * 10 + units;
@@ -1132,7 +1372,6 @@
             explanation: `Trong số ${num}, chữ số hàng chục là ${tens}`,
           };
         } else {
-          // Số lớn nhất / nhỏ nhất trong 4 số
           const isMax = Math.random() > 0.5;
           let nums = [];
           while (nums.length < 4) {
@@ -1153,13 +1392,12 @@
         }
       }
 
-      // TOPIC 2: Phép cộng & Phép trừ KHÔNG NHỚ
+      // TOPIC 2: Phép cộng & Trừ KHÔNG NHỚ
       function generateTopic2Question() {
         const mode = Math.floor(Math.random() * 4);
         const isMCQ = Math.random() > 0.5;
 
         if (mode === 0) {
-          // Cộng nhẩm tròn chục
           const aTens = Math.floor(Math.random() * 5) + 1;
           const bTens = Math.floor(Math.random() * 4) + 1;
           const a = aTens * 10;
@@ -1175,7 +1413,6 @@
             options: generateMCQOptions(ans),
           };
         } else if (mode === 1) {
-          // Trừ nhẩm tròn chục
           const bTens = Math.floor(Math.random() * 4) + 1;
           const ansTens = Math.floor(Math.random() * 4) + 1;
           const a = (bTens + ansTens) * 10;
@@ -1191,7 +1428,6 @@
             options: generateMCQOptions(ans),
           };
         } else if (mode === 2) {
-          // Cộng không nhớ 2 chữ số với 2 chữ số (đơn vị cộng đơn vị < 10)
           const aU = Math.floor(Math.random() * 5);
           const bU = Math.floor(Math.random() * (9 - aU));
           const aT = Math.floor(Math.random() * 4) + 1;
@@ -1210,7 +1446,6 @@
             options: generateMCQOptions(ans),
           };
         } else {
-          // Trừ không nhớ 2 chữ số với 2 chữ số
           const ansU = Math.floor(Math.random() * 5);
           const bU = Math.floor(Math.random() * 5);
           const aU = ansU + bU;
@@ -1234,15 +1469,14 @@
         }
       }
 
-      // TOPIC 3: Phép cộng & Phép trừ CÓ NHỚ (CHỦ ĐỀ MỚI TÁCH)
+      // TOPIC 3: Phép cộng & Trừ CÓ NHỚ
       function generateTopic3Question() {
         const mode = Math.floor(Math.random() * 4);
         const isMCQ = Math.random() > 0.4;
 
         if (mode === 0) {
-          // Cộng qua 10 phạm vi 20 (ví dụ 8 + 7, 9 + 5)
-          const a = Math.floor(Math.random() * 5) + 5; // 5-9
-          const b = Math.floor(Math.random() * 5) + (10 - a + 1); // sao cho a+b > 10
+          const a = Math.floor(Math.random() * 5) + 5;
+          const b = Math.floor(Math.random() * 5) + (10 - a + 1);
           const ans = a + b;
 
           return {
@@ -1254,10 +1488,9 @@
             options: generateMCQOptions(ans),
           };
         } else if (mode === 1) {
-          // Trừ qua 10 phạm vi 20 (ví dụ 14 - 8, 16 - 9)
-          const b = Math.floor(Math.random() * 5) + 5; // 5-9
-          const ans = Math.floor(Math.random() * 5) + 4; // 4-8
-          const a = b + ans; // 11-17
+          const b = Math.floor(Math.random() * 5) + 5;
+          const ans = Math.floor(Math.random() * 5) + 4;
+          const a = b + ans;
 
           return {
             type: isMCQ ? "mcq" : "fill",
@@ -1268,9 +1501,7 @@
             options: generateMCQOptions(ans),
           };
         } else if (mode === 2) {
-          // Cộng có nhớ số có 2 chữ số (38 + 25)
-          const aU = Math.floor(Math.random() * 5) + 5; // 5-9
-          const bU = Math.floor(Math.random() * (9 - 10 + aU + 1)) + (10 - aU); // aU + bU >= 10
+          const aU = Math.floor(Math.random() * 5) + 5;
           const aT = Math.floor(Math.random() * 3) + 1;
           const bT = Math.floor(Math.random() * 3) + 1;
 
@@ -1287,11 +1518,9 @@
             options: generateMCQOptions(ans),
           };
         } else {
-          // Trừ có nhớ số có 2 chữ số (52 - 27)
-          const aU = Math.floor(Math.random() * 4); // 0-3
-          const bU = aU + Math.floor(Math.random() * 4) + 3; // bU > aU (phải mượn)
-
-          const aT = Math.floor(Math.random() * 4) + 4; // 4-7
+          const aU = Math.floor(Math.random() * 4);
+          const bU = aU + Math.floor(Math.random() * 4) + 3;
+          const aT = Math.floor(Math.random() * 4) + 4;
           const bT = Math.floor(Math.random() * (aT - 2)) + 1;
 
           const a = aT * 10 + aU;
@@ -1309,13 +1538,12 @@
         }
       }
 
-      // TOPIC 4: Phép tính PHẠM VI 100 (CHỦ ĐỀ MỚI TÁCH)
+      // TOPIC 4: Biểu thức & Tìm X
       function generateTopic4Question() {
         const mode = Math.floor(Math.random() * 4);
         const isMCQ = Math.random() > 0.4;
 
         if (mode === 0) {
-          // Biểu thức 2 phép tính (A + B - C)
           const a = Math.floor(Math.random() * 30) + 20;
           const b = Math.floor(Math.random() * 25) + 10;
           const c = Math.floor(Math.random() * 20) + 5;
@@ -1330,7 +1558,6 @@
             options: generateMCQOptions(ans),
           };
         } else if (mode === 1) {
-          // Tìm X (X + A = B)
           const x = Math.floor(Math.random() * 35) + 12;
           const a = Math.floor(Math.random() * 30) + 10;
           const b = x + a;
@@ -1343,7 +1570,6 @@
             explanation: `Muốn tìm X ta lấy ${b} - ${a} = ${x}`,
           };
         } else if (mode === 2) {
-          // Tìm X (B - X = A)
           const x = Math.floor(Math.random() * 25) + 10;
           const a = Math.floor(Math.random() * 30) + 15;
           const b = x + a;
@@ -1356,10 +1582,9 @@
             explanation: `Muốn tìm X ta lấy ${b} - ${a} = ${x}`,
           };
         } else {
-          // Tổng / Hiệu của số lớn nhất có 2 chữ số khác nhau...
           const isAdd = Math.random() > 0.5;
-          const num1 = 98; // số lớn nhất có 2 chữ số khác nhau
-          const num2 = 10; // số nhỏ nhất có 2 chữ số
+          const num1 = 98;
+          const num2 = 10;
           const ans = isAdd ? num1 + num2 : num1 - num2;
           const title = isAdd ? "Tính tổng" : "Tính hiệu";
 
@@ -1433,11 +1658,12 @@
         }
       }
 
-      // TOPIC 6: Đại lượng & Đo lường
+      // TOPIC 6: Đại lượng & Thời gian (Expanded: Hours, Days, Weeks, Months, Years)
       function generateTopic6Question() {
-        const mode = Math.floor(Math.random() * 4);
+        const mode = Math.floor(Math.random() * 8); // 8 distinct sub-types
 
         if (mode === 0) {
+          // Clock reading
           const hours = Math.floor(Math.random() * 12) + 1;
           const minutesArr = [0, 15, 30, 45];
           const minutes =
@@ -1463,6 +1689,106 @@
             ]),
           };
         } else if (mode === 1) {
+          // Days in a week
+          return {
+            type: "mcq",
+            topic: 6,
+            text: `Một tuần lễ có tất cả bao nhiêu ngày?`,
+            answer: "7 ngày",
+            explanation:
+              "Một tuần lễ gồm 7 ngày: Thứ Hai, Thứ Ba, Thứ Tư, Thứ Năm, Thứ Sáu, Thứ Bảy, Chủ Nhật.",
+            options: [
+              { value: "7 ngày", label: "7 ngày" },
+              { value: "5 ngày", label: "5 ngày" },
+              { value: "6 ngày", label: "6 ngày" },
+              { value: "10 ngày", label: "10 ngày" },
+            ],
+          };
+        } else if (mode === 2) {
+          // Days of the week calculation
+          const weekDays = [
+            "Thứ Hai",
+            "Thứ Ba",
+            "Thứ Tư",
+            "Thứ Năm",
+            "Thứ Sáu",
+            "Thứ Bảy",
+            "Chủ Nhật",
+          ];
+          const startIdx = Math.floor(Math.random() * 7);
+          const jump = Math.floor(Math.random() * 3) + 1; // 1 to 3 days later
+          const targetIdx = (startIdx + jump) % 7;
+
+          return {
+            type: "mcq",
+            topic: 6,
+            text: `Hôm nay là ${weekDays[startIdx]}. Hỏi ${jump} ngày nữa sẽ là Thứ mấy?`,
+            answer: weekDays[targetIdx],
+            explanation: `Từ ${weekDays[startIdx]} đếm tiếp ${jump} ngày nữa là đến ${weekDays[targetIdx]}.`,
+            options: generateMCQOptionsString(weekDays[targetIdx], weekDays),
+          };
+        } else if (mode === 3) {
+          // Months in a year
+          return {
+            type: "mcq",
+            topic: 6,
+            text: `Một năm có tất cả bao nhiêu tháng?`,
+            answer: "12 tháng",
+            explanation: "Một năm gồm 12 tháng (từ Tháng 1 đến Tháng 12).",
+            options: [
+              { value: "12 tháng", label: "12 tháng" },
+              { value: "10 tháng", label: "10 tháng" },
+              { value: "7 tháng", label: "7 tháng" },
+              { value: "24 tháng", label: "24 tháng" },
+            ],
+          };
+        } else if (mode === 4) {
+          // Days in specific month (e.g. February vs 31-day months)
+          const monthType = Math.random() > 0.5;
+          if (monthType) {
+            return {
+              type: "mcq",
+              topic: 6,
+              text: `Tháng nào sau đây thường chỉ có 28 hoặc 29 ngày?`,
+              answer: "Tháng 2",
+              explanation:
+                "Tháng 2 đặc biệt có 28 ngày (vào năm nhuận có 29 ngày).",
+              options: [
+                { value: "Tháng 2", label: "Tháng 2" },
+                { value: "Tháng 1", label: "Tháng 1" },
+                { value: "Tháng 4", label: "Tháng 4" },
+                { value: "Tháng 12", label: "Tháng 12" },
+              ],
+            };
+          } else {
+            const month31 = [
+              "Tháng 1",
+              "Tháng 3",
+              "Tháng 5",
+              "Tháng 7",
+              "Tháng 8",
+              "Tháng 10",
+              "Tháng 12",
+            ];
+            const chosen31 =
+              month31[Math.floor(Math.random() * month31.length)];
+
+            return {
+              type: "mcq",
+              topic: 6,
+              text: `${chosen31} trong năm có bao nhiêu ngày?`,
+              answer: "31 ngày",
+              explanation: `${chosen31} là tháng có đúng 31 ngày.`,
+              options: [
+                { value: "31 ngày", label: "31 ngày" },
+                { value: "30 ngày", label: "30 ngày" },
+                { value: "28 ngày", label: "28 ngày" },
+                { value: "29 ngày", label: "29 ngày" },
+              ],
+            };
+          }
+        } else if (mode === 5) {
+          // Weight (kg) or Capacity (liter) addition
           const isKg = Math.random() > 0.5;
           const unit = isKg ? "kg" : "l";
           const a = Math.floor(Math.random() * 30) + 15;
@@ -1477,9 +1803,10 @@
             answer: ansNum,
             explanation: `${a} ${isAdd ? "+" : "-"} ${b} = ${ansNum} ${unit}`,
           };
-        } else if (mode === 2) {
-          const isConvert = Math.random() > 0.5;
-          if (isConvert) {
+        } else if (mode === 6) {
+          // Length conversion (m, dm, cm)
+          const isConvertM = Math.random() > 0.5;
+          if (isConvertM) {
             const mVal = Math.floor(Math.random() * 8) + 1;
             const cmAns = mVal * 100;
 
@@ -1488,7 +1815,7 @@
               topic: 6,
               text: `${mVal} m = ...... cm? (Điền số)`,
               answer: cmAns,
-              explanation: `1 m = 100 cm, vậy ${mVal} m = ${cmAns} cm`,
+              explanation: `1 m = 100 cm, nên ${mVal} m = ${cmAns} cm`,
             };
           } else {
             const dmVal = Math.floor(Math.random() * 8) + 1;
@@ -1499,10 +1826,11 @@
               topic: 6,
               text: `${dmVal} dm = ...... cm? (Điền số)`,
               answer: cmAns,
-              explanation: `1 dm = 10 cm, vậy ${dmVal} dm = ${cmAns} cm`,
+              explanation: `1 dm = 10 cm, nên ${dmVal} dm = ${cmAns} cm`,
             };
           }
         } else {
+          // Money calculation
           const notes = [1000, 2000, 5000, 10000, 20000];
           const n1 = notes[Math.floor(Math.random() * notes.length)];
           const n2 = notes[Math.floor(Math.random() * notes.length)];
@@ -1572,7 +1900,6 @@
             ],
           };
         } else if (mode === 2) {
-          // Độ dài đường gấp khúc
           const d1 = Math.floor(Math.random() * 5) + 3;
           const d2 = Math.floor(Math.random() * 5) + 4;
           const d3 = Math.floor(Math.random() * 5) + 3;
@@ -1655,7 +1982,7 @@
         if (topicId === 7) return generateTopic7Question();
         if (topicId === 8) return generateTopic8Question();
 
-        // Topic 0: Mix mode
+        // Topic 0: Kiểm tra tổng hợp (Mix Mode)
         const rnd = Math.floor(Math.random() * 8) + 1;
         return generateQuestionForTopic(rnd);
       }
@@ -1684,7 +2011,7 @@
         let list = [...new Set(choicesList)];
         if (!list.includes(correctStr)) list.push(correctStr);
         while (list.length < 4) {
-          list.push(`Đáp án phụ ${list.length + 1}`);
+          list.push(`Đáp án ${list.length + 1}`);
         }
         list.sort(() => Math.random() - 0.5);
 
@@ -1694,27 +2021,103 @@
         }));
       }
 
-      // NAVIGATION & QUIZ LIFECYCLE
+      // --- TIMER MANAGEMENT ---
+
+      function startTimer(durationSeconds) {
+        stopTimer();
+        timerSecondsRemaining = durationSeconds;
+        startTimeStamp = Date.now();
+
+        const timerBox = document.getElementById("header-timer-box");
+        if (timerBox) timerBox.classList.remove("hidden");
+
+        updateTimerDisplay();
+
+        timerInterval = setInterval(() => {
+          timerSecondsRemaining--;
+          updateTimerDisplay();
+
+          if (timerSecondsRemaining <= 0) {
+            stopTimer();
+            alert(
+              "⏰ Đã hết thời gian làm bài 45 phút! Hệ thống đang nộp bài và chấm điểm...",
+            );
+            finishQuiz();
+          }
+        }, 1000);
+      }
+
+      function stopTimer() {
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        const timerBox = document.getElementById("header-timer-box");
+        if (timerBox) timerBox.classList.add("hidden");
+      }
+
+      function updateTimerDisplay() {
+        const minutes = Math.floor(timerSecondsRemaining / 60);
+        const seconds = timerSecondsRemaining % 60;
+        const formatted = `${minutes < 10 ? "0" : ""}${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+        const timerText = document.getElementById("header-timer-text");
+        if (timerText) timerText.innerText = formatted;
+      }
+
+      function formatTimeSpent(seconds) {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m < 10 ? "0" : ""}${m}:${s < 10 ? "0" : ""}${s}`;
+      }
+
+      // --- NAVIGATION & QUIZ LIFECYCLE ---
 
       function showTopicSelection() {
+        stopTimer();
         document.getElementById("view-topics").classList.remove("hidden");
         document.getElementById("view-quiz").classList.add("hidden");
         document.getElementById("view-summary").classList.add("hidden");
+      }
+
+      function confirmExitQuiz() {
+        const quizView = document.getElementById("view-quiz");
+        if (quizView && !quizView.classList.contains("hidden")) {
+          if (confirm("Em có muốn rời khỏi bài thi hiện tại không?")) {
+            showTopicSelection();
+          }
+        } else {
+          showTopicSelection();
+        }
+      }
+
+      function submitQuizEarly() {
+        if (confirm("Em có chắc chắn muốn nộp bài sớm không?")) {
+          finishQuiz();
+        }
       }
 
       function startQuiz(topicId) {
         initAudio();
         playSound("click");
         currentTopic = topicId;
+        totalScore = 0;
+        currentStreak = 0;
         questionIndex = 0;
         correctCount = 0;
+        updateHeaderStats();
 
-        // Generate 15 non-repeating questions
+        // Set question count: Topic 0 = 30 questions, Topics 1-8 = 20 questions
+        totalQuestionsInQuiz = topicId === 0 ? 30 : 20;
+
+        // Generate non-repeating questions
         currentQuestions = [];
         let usedKeys = new Set();
         let attempts = 0;
 
-        while (currentQuestions.length < 15 && attempts < 300) {
+        while (
+          currentQuestions.length < totalQuestionsInQuiz &&
+          attempts < 500
+        ) {
           attempts++;
           let q = generateQuestionForTopic(topicId);
           let key = `${q.text}|${q.answer}`;
@@ -1724,9 +2127,25 @@
           }
         }
 
+        if (currentQuestions.length === 0) {
+          alert("Không thể tạo câu hỏi. Em hãy thử lại nhé!");
+          showTopicSelection();
+          return;
+        }
+
+        totalQuestionsInQuiz = currentQuestions.length;
+
         document.getElementById("view-topics").classList.add("hidden");
         document.getElementById("view-summary").classList.add("hidden");
         document.getElementById("view-quiz").classList.remove("hidden");
+
+        // Timer management: Start 45 min timer for Topic 0 (Kiểm Tra Tổng Hợp)
+        if (topicId === 0) {
+          startTimer(45 * 60);
+        } else {
+          stopTimer();
+          startTimeStamp = Date.now();
+        }
 
         renderCurrentQuestion();
       }
@@ -1739,18 +2158,18 @@
 
         const q = currentQuestions[questionIndex];
 
-        // Progress Update (15 Questions)
+        // Progress Update
         document.getElementById("quiz-progress-text").innerText =
-          `${questionIndex + 1} / 15`;
+          `${questionIndex + 1} / ${totalQuestionsInQuiz}`;
         document.getElementById("quiz-progress-bar").style.width =
-          `${((questionIndex + 1) / 15) * 100}%`;
+          `${((questionIndex + 1) / totalQuestionsInQuiz) * 100}%`;
         document.getElementById("question-id-text").innerText =
           `#Q${questionIndex + 1}`;
 
         // Topic Badge
         const topicBadge = document.getElementById("quiz-badge");
         const topicNames = [
-          "Tổng hợp 8 chủ đề",
+          "Kiểm Tra Tổng Hợp 30 Câu",
           "Chủ đề 1",
           "Chủ đề 2",
           "Chủ đề 3",
@@ -1962,12 +2381,8 @@
 
       function submitTwoStepAnswer() {
         if (isAnswered) return;
-        if (!twoStepSelectedEq) {
-          return;
-        }
-        if (twoStepFillInput === "") {
-          return;
-        }
+        if (!twoStepSelectedEq) return;
+        if (twoStepFillInput === "") return;
 
         isAnswered = true;
         const q = currentQuestions[questionIndex];
@@ -2098,6 +2513,8 @@
 
       function finishQuiz() {
         playSound("fanfare");
+        timeSpentSeconds = Math.round((Date.now() - startTimeStamp) / 1000);
+        stopTimer();
 
         if (typeof confetti === "function") {
           confetti({
@@ -2107,13 +2524,39 @@
           });
         }
 
+        // Calculate score on a 10-point scale
+        const totalQuestions = currentQuestions.length;
+        const score10 =
+          Math.round((correctCount / totalQuestions) * 10 * 10) / 10;
+        const percent = Math.round((correctCount / totalQuestions) * 100);
+
         document.getElementById("view-quiz").classList.add("hidden");
         document.getElementById("view-summary").classList.remove("hidden");
 
+        document.getElementById("sum-scale10").innerText = `${score10} / 10`;
         document.getElementById("sum-correct").innerText =
-          `${correctCount} / 15`;
-        document.getElementById("sum-score").innerText =
-          `+${correctCount * 10} ⭐`;
+          `${correctCount} / ${totalQuestions}`;
+        document.getElementById("sum-percent").innerText = `${percent}%`;
+        document.getElementById("sum-time-spent").innerText =
+          formatTimeSpent(timeSpentSeconds);
+
+        // Rating Text & Badge Icon
+        const ratingText = document.getElementById("sum-rating-text");
+        const badgeIcon = document.getElementById("summary-badge-icon");
+
+        if (score10 === 10) {
+          ratingText.innerText = "🌟 Xuất Sắc! Điểm Tuyệt Đối 10/10!";
+          badgeIcon.innerText = "🏆";
+        } else if (score10 >= 8) {
+          ratingText.innerText = "🥇 Giỏi Lắm! Đạt Kết Quả Rất Cao!";
+          badgeIcon.innerText = "🥇";
+        } else if (score10 >= 5) {
+          ratingText.innerText = "👍 Khá Tốt! Hãy Cố Gắng Phát Huy Nữa Nhé!";
+          badgeIcon.innerText = "🎖️";
+        } else {
+          ratingText.innerText = "💪 Cố Gắng Hơn Ở Lần Sau Nhé!";
+          badgeIcon.innerText = "📚";
+        }
       }
 
       function restartQuiz() {
